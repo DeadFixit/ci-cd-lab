@@ -1,9 +1,15 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'python:3.12-slim'
+      args '-u root:root'
+    }
+  }
 
   stages {
     stage('Install') {
       steps {
+        sh 'python -m pip install -U pip'
         sh 'pip install -r requirements.txt'
       }
     }
@@ -16,25 +22,7 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'pytest'
-      }
-    }
-
-    stage('Docker Build') {
-      steps {
-        sh 'docker build -t ci-app .'
-      }
-    }
-
-    stage('SonarQube') {
-      steps {
-        sh 'echo "Sonar scan placeholder"'
-      }
-    }
-
-    stage('Deploy') {
-      steps {
-        sh 'echo "Deploy placeholder"'
+        sh 'pytest -q'
       }
     }
   }
