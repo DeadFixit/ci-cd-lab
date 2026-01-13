@@ -1,23 +1,28 @@
 pipeline {
   agent any
 
+  environment {
+    VENV = ".venv"
+  }
+
   stages {
     stage('Install') {
       steps {
-        sh 'python3 -m pip install -U pip'
-        sh 'pip3 install -r requirements.txt'
+        sh 'python3 -m venv $VENV'
+        sh '. $VENV/bin/activate && python -m pip install -U pip'
+        sh '. $VENV/bin/activate && pip install -r requirements.txt'
       }
     }
 
     stage('Lint') {
       steps {
-        sh 'flake8 app.py || true'
+        sh '. $VENV/bin/activate && flake8 app.py || true'
       }
     }
 
     stage('Test') {
       steps {
-        sh 'pytest -q'
+        sh '. $VENV/bin/activate && pytest -q'
       }
     }
   }
